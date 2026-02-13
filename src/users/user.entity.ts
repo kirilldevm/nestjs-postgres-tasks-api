@@ -39,6 +39,6 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Task, (task) => task.user, { cascade: true })
+  @OneToMany(() => Task, (task) => task.user)
   tasks: Task[];
 }

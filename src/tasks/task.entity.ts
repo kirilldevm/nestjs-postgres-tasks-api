@@ -45,7 +45,9 @@ export class Task {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @OneToMany(() => TaskLabel, (label) => label.task)
+  @OneToMany(() => TaskLabel, (label) => label.task, {
+    cascade: true,
+  })
   labels: TaskLabel[];
 
   @CreateDateColumn()

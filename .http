@@ -26,8 +26,12 @@ Content-Type: {{contentType}}
 {
   "title": "Yoq",
   "description": "Task 1 description",
-  "status": "IN_PROGRESS",
-  "user_id": "321e47ff-a82f-4fe0-8342-974a40755316"
+  "user_id": "321e47ff-a82f-4fe0-8342-974a40755316",
+  "labels": [
+    {
+      "name": "label1"
+    }
+  ]
 }
 
 ### Set task id
@@ -41,5 +45,40 @@ Content-Type: {{contentType}}
   "status": "IN_PROGRESS"
 }
 
+### Add labels to a task
+# @name addLabels
+PATCH {{baseUrl}}/tasks/{{taskId}}/labels
+Content-Type: {{contentType}}
+
+  [
+    {
+      "name": "label2"
+    }
+  ]
+
+### Update task
+PATCH {{baseUrl}}/tasks/{{taskId}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Updated Task",
+  "description": "Updated description",
+  "status": "DONE",
+  "labels": [
+  {
+    "name": "label2"
+  }
+  ]
+}
+
 ### Delete a task
 DELETE {{baseUrl}}/tasks/{{taskId}}
+
+
+### Remove labels from a task
+DELETE {{baseUrl}}/tasks/{{taskId}}/labels
+Content-Type: {{contentType}}
+
+[
+  "label1"
+]

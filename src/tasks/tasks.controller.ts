@@ -9,8 +9,8 @@ import {
   Param,
   Patch,
   Post,
-  Put,
 } from '@nestjs/common';
+import { CreateTaskLabelDto } from './create-task-label.dto';
 import { CreateTaskDto } from './create-task.dto';
 import { FindOneParamsDto } from './find-one.params.dto';
 import { Task } from './task.entity';
@@ -46,12 +46,29 @@ export class TasksController {
     return this.tasksService.updateStatus(params.id, body.status);
   }
 
-  @Put('/:id')
+  @Patch('/:id')
   public update(
     @Param() params: FindOneParamsDto,
     @Body() body: UpdateTaskDto,
   ): Promise<Task | NotFoundException> {
     return this.tasksService.update(params.id, body);
+  }
+
+  @Patch('/:id/labels')
+  public addLabels(
+    @Param() { id }: FindOneParamsDto,
+    @Body() body: CreateTaskLabelDto[],
+  ): Promise<Task | NotFoundException> {
+    return this.tasksService.addLabels(id, body);
+  }
+
+  @Delete('/:id/labels')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  public async removeLabels(
+    @Param() { id }: FindOneParamsDto,
+    @Body() labelNames: string[],
+  ): Promise<void> {
+    await this.tasksService.removeLabels(id, labelNames);
   }
 
   @Delete('/:id')
