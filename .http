@@ -1,0 +1,45 @@
+### Variables
+
+@baseUrl = http://localhost:3000
+
+@contentType = application/json
+
+# Main page
+GET {{baseUrl}}
+
+
+# Tasks page
+
+### Get all tasks
+GET {{baseUrl}}/tasks
+
+
+### Get a task by id
+GET {{baseUrl}}/tasks/{{taskId}}
+
+
+### Create a task
+# @name createTask
+POST {{baseUrl}}/tasks
+Content-Type: {{contentType}}
+
+{
+  "title": "Yoq",
+  "description": "Task 1 description",
+  "status": "IN_PROGRESS",
+  "user_id": "321e47ff-a82f-4fe0-8342-974a40755316"
+}
+
+### Set task id
+@taskId = {{ createTask.response.body.id }}
+
+### Change task status
+PATCH {{baseUrl}}/tasks/{{taskId}}/status
+Content-Type: {{contentType}}
+
+{
+  "status": "IN_PROGRESS"
+}
+
+### Delete a task
+DELETE {{baseUrl}}/tasks/{{taskId}}
