@@ -11,10 +11,16 @@ GET {{baseUrl}}
 # Tasks page
 
 ### Get all tasks
+# @name getAllTasks
 GET {{baseUrl}}/tasks
+
+### Get all tasks with status IN_PROGRESS
+# @name getAllTasksWithStatusInProgress
+GET {{baseUrl}}/tasks?labels=label1,label2&sortBy=createdAt&sortOrder=DESC
 
 
 ### Get a task by id
+# @name getTaskById
 GET {{baseUrl}}/tasks/{{taskId}}
 
 
@@ -38,6 +44,7 @@ Content-Type: {{contentType}}
 @taskId = {{ createTask.response.body.id }}
 
 ### Change task status
+# @name changeTaskStatus
 PATCH {{baseUrl}}/tasks/{{taskId}}/status
 Content-Type: {{contentType}}
 

@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationParams } from 'src/common/pagination.params';
+import { PaginationResponse } from 'src/common/pagination.response';
 import { Repository } from 'typeorm';
 import { CreateTaskLabelDto } from './create-task-label.dto';
 import { CreateTaskDto } from './create-task.dto';
+import { FindTaskParams } from './find-task.params';
 import { TaskLabel } from './task-label.entity';
 import { Task } from './task.entity';
 import { TaskStatus } from './task.model';
@@ -18,8 +21,63 @@ export class TasksService {
     private taskLabelsRepository: Repository<TaskLabel>,
   ) {}
 
-  public findAll(): Promise<Task[]> {
-    return this.tasksRepository.find({ relations: ['labels'] });
+  public async findAll(
+    filters: FindTaskParams & PaginationParams,
+  ): Promise<PaginationResponse<Task>> {
+    const query = this.tasksRepository
+      .createQueryBuilder('task')
+      .leftJoinAndSelect('task.labels', 'labels');
+
+    if (filters.status) {
+      query.andWhere('task.status = :status', { status: filters.status });
+    }
+
+    if (filters.search?.trim()) {
+      query.andWhere(
+        '(task.title LIKE :search OR task.description LIKE :search)',
+        { search: `%${filters.search.trim().toLowerCase()}%` },
+      );
+    }
+
+    if (filters.labels?.length) {
+      // Return all task ids that have at least one of the labels
+      const subQuery = query
+        .subQuery()
+        .select('labels.task_id')
+        .from('task_label', 'labels')
+        .where('labels.name IN (:...labels)', {
+          labels: Array.isArray(filters.labels)
+            ? filters.labels
+            : (filters.labels as string).split(',').map((l) => l.trim()),
+        });
+
+      query.andWhere(`task.id IN (${subQuery.getQuery()})`);
+      // const rawLabels = filters.labels as string | string[];
+      // const labelArray = Array.isArray(rawLabels)
+      //   ? rawLabels
+      //   : String(rawLabels)
+      //       .split(',')
+      //       .map((l) => l.trim())
+      //       .filter(Boolean);
+
+      // if (labelArray.length) {
+      //   query.andWhere('labels.name IN (:...labels)', {
+      //     labels: labelArray,
+      //   });
+      // }
+    }
+
+    query.orderBy(`task.${filters.sortBy}`, filters.sortOrder);
+    query.skip(+(filters.offset ?? 0)).take(+(filters.limit ?? 10));
+
+    const [tasks, total] = await query.getManyAndCount();
+
+    return {
+      data: tasks,
+      total,
+      page: Math.floor((filters.offset ?? 0) / (filters.limit ?? 10)) + 1,
+      limit: +(filters.limit ?? 10),
+    };
   }
 
   public async findOne(id: string): Promise<Task | NotFoundException> {
