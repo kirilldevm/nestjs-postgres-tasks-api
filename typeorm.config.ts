@@ -12,5 +12,5 @@ export default new DataSource({
   database: process.env.POSTGRES_DB,
   synchronize: false,
   entities: [__dirname + 'dist/**/*.entity.{js,ts}'],
-  migrations: [__dirname + 'dist/migrations/*.{js,ts}'],
+  migrations: [__dirname + 'dist/src/migrations/*.{js,ts}'],
 });
