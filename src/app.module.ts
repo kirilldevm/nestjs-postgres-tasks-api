@@ -25,6 +25,7 @@ import { UsersModule } from './users/users.module';
       }),
     }),
     ConfigModule.forRoot({
+      isGlobal: true,
       load: [appConfig, dbConfig, authConfig],
       validationSchema: appConfigSchema,
       validationOptions: {

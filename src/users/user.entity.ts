@@ -1,3 +1,4 @@
+import { Exclude, Expose } from 'class-transformer';
 import { Task } from 'src/tasks/task.entity';
 import {
   Column,
@@ -7,16 +8,19 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Role } from './role.enum';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
+  @Expose()
   id: string;
 
   @Column({
     type: 'varchar',
     length: 100,
   })
+  @Expose()
   name: string;
 
   @Column({
@@ -25,20 +29,34 @@ export class User {
     nullable: false,
     unique: true,
   })
+  @Expose()
   email: string;
 
   @Column({
     type: 'varchar',
     length: 100,
   })
+  @Exclude()
   password: string;
 
   @CreateDateColumn()
+  @Expose()
   createdAt: Date;
 
   @UpdateDateColumn()
+  @Expose()
   updatedAt: Date;
 
   @OneToMany(() => Task, (task) => task.user)
+  @Expose()
   tasks: Task[];
+
+  @Column({
+    array: true,
+    type: 'enum',
+    enum: Role,
+    default: [Role.USER],
+  })
+  @Expose()
+  roles: Role[];
 }

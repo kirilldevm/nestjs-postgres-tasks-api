@@ -89,3 +89,13 @@ Content-Type: {{contentType}}
 [
   "label1"
 ]
+
+### Register user
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "test@example.com",
+  "password": "Password123!",
+  "name": "Test User"
+}

@@ -5,7 +5,7 @@ import { PaginationResponse } from 'src/common/pagination.response';
 import { Repository } from 'typeorm';
 import { CreateTaskLabelDto } from './create-task-label.dto';
 import { CreateTaskDto } from './create-task.dto';
-import { FindTaskParams } from './find-task.params';
+import { FindTaskParams } from './find-task.params.dto';
 import { TaskLabel } from './task-label.entity';
 import { Task } from './task.entity';
 import { TaskStatus } from './task.model';
@@ -23,10 +23,12 @@ export class TasksService {
 
   public async findAll(
     filters: FindTaskParams & PaginationParams,
+    userId: string,
   ): Promise<PaginationResponse<Task>> {
     const query = this.tasksRepository
       .createQueryBuilder('task')
-      .leftJoinAndSelect('task.labels', 'labels');
+      .leftJoinAndSelect('task.labels', 'labels')
+      .where('task.user_id = :userId', { userId });
 
     if (filters.status) {
       query.andWhere('task.status = :status', { status: filters.status });
@@ -67,7 +69,10 @@ export class TasksService {
       // }
     }
 
-    query.orderBy(`task.${filters.sortBy}`, filters.sortOrder);
+    const sortBy = filters.sortBy ?? 'createdAt';
+    const sortOrder = filters.sortOrder ?? 'DESC';
+    query.orderBy(`task.${sortBy}`, sortOrder);
+
     query.skip(+(filters.offset ?? 0)).take(+(filters.limit ?? 10));
 
     const [tasks, total] = await query.getManyAndCount();

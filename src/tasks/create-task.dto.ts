@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
   MaxLength,
   MinLength,
   ValidateNested,
@@ -23,8 +22,6 @@ export class CreateTaskDto {
   @MaxLength(100)
   description: string;
 
-  @IsNotEmpty()
-  @IsUUID()
   user_id: string;
 
   @IsOptional()
